@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -14,7 +14,6 @@ import FitnessPage from './pages/FitnessPage';
 import MusicPage from './pages/MusicPage';
 import ProfessionalPage from './pages/ProfessionalPage';
 import AdminPage from './pages/AdminPage';
-import RacesAdminPage from './pages/RacesAdminPage';
 import SpotifyCallback from './pages/SpotifyCallback';
 
 // Global Styles
@@ -47,11 +46,9 @@ function App() {
             <Route path="/music" element={<MusicPage />} />
             <Route path="/professional" element={<ProfessionalPage />} />
             <Route path="/auth/spotify/callback" element={<SpotifyCallback />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/admin/races" element={<RacesAdminPage />} />
+          </Routes>
           </Routes>
         </MainContent>
-        <Toaster 
           position="top-right"
           toastOptions={{
             duration: 4000,
@@ -66,4 +63,4 @@ function App() {
   );
 }
 
-export default App;
+export default App; 

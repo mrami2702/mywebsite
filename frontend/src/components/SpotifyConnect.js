@@ -19,6 +19,10 @@ const SpotifyConnect = () => {
         fetch('http://localhost:8000/api/spotify/recently-played')
       ]);
 
+      console.log('Profile response status:', profileResponse.status, profileResponse.ok);
+      console.log('Top tracks response status:', topTracksResponse.status, topTracksResponse.ok);
+      console.log('Recently played response status:', recentlyPlayedResponse.status, recentlyPlayedResponse.ok);
+      
       if (profileResponse.ok && topTracksResponse.ok && recentlyPlayedResponse.ok) {
         const profile = await profileResponse.json();
         const topTracks = await topTracksResponse.json();

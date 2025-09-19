@@ -18,14 +18,20 @@ const StravaConnect = () => {
         fetch('http://localhost:8000/api/strava/activities?per_page=10')
       ]);
 
+      console.log('Athlete response status:', athleteResponse.status, athleteResponse.ok);
+      console.log('Activities response status:', activitiesResponse.status, activitiesResponse.ok);
+      
       if (athleteResponse.ok && activitiesResponse.ok) {
         const athlete = await athleteResponse.json();
         const activities = await activitiesResponse.json();
         setStravaData({ athlete, activities });
       } else {
+        console.log('Athlete response error:', athleteResponse.status, await athleteResponse.text());
+        console.log('Activities response error:', activitiesResponse.status, await activitiesResponse.text());
         setError('Unable to load Strava data');
       }
     } catch (err) {
+      console.error('Fetch error:', err);
       setError('Failed to connect to Strava');
     } finally {
       setLoading(false);

@@ -1,14 +1,50 @@
 import React, { useState, useEffect } from "react";
-import { FiExternalLink, FiCalendar, FiTag, FiBookOpen, FiSearch, FiHeart, FiClock } from "react-icons/fi";
-import { articleAPI } from "../services/articleAPI";
+import { FiExternalLink, FiCalendar, FiTag, FiBookOpen, FiSearch, FiPlus, FiHeart, FiClock, FiX } from "react-icons/fi";
 
 const ArticlesPage = () => {
   const [articles, setArticles] = useState([]);
   const [filteredArticles, setFilteredArticles] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newArticle, setNewArticle] = useState({
+    title: "",
+    url: "",
+    description: "",
+    category: "technology",
+    tags: "",
+    readTime: "",
+    source: ""
+  });
+
+  const sampleArticles = [
+    {
+      id: 1,
+      title: "Writing effective tools for agents  with agents",
+      url: "https://www.anthropic.com/engineering/writing-tools-for-agents",
+      description: "Agents are only as effective as the tools we give them. We share how to write high-quality tools and evaluations, and how you can boost performance by using Claude to optimize its tools for itself.",
+      category: "technology",
+      tags: ["AI", "Agents", "Tools", "MCP", "Engineering"],
+      readTime: "15 min read",
+      source: "Anthropic Engineering",
+      dateAdded: "2024-01-15",
+      isRead: false,
+      isFavorite: true
+    },
+    {
+      id: 2,
+      title: "The Future of AI in Healthcare",
+      url: "https://example.com/ai-healthcare",
+      description: "Exploring how artificial intelligence is revolutionizing medical diagnosis and treatment.",
+      category: "technology",
+      tags: ["AI", "Healthcare", "Innovation"],
+      readTime: "8 min read",
+      source: "TechCrunch",
+      dateAdded: "2024-01-15",
+      isRead: false,
+      isFavorite: true
+    }
+  ];
 
   const categories = [
     { id: "all", name: "All Articles", icon: FiBookOpen, color: "blue" },
@@ -18,22 +54,13 @@ const ArticlesPage = () => {
   ];
 
   useEffect(() => {
-    loadArticles();
-  }, []);
-
-  const loadArticles = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const articlesData = await articleAPI.getArticles();
-      setArticles(articlesData);
-    } catch (err) {
-      console.error('Error loading articles:', err);
-      setError('Failed to load articles. Please try again later.');
-    } finally {
-      setLoading(false);
+    const savedArticles = localStorage.getItem("articles");
+    if (savedArticles) {
+      setArticles(JSON.parse(savedArticles));
+    } else {
+      setArticles(sampleArticles);
     }
-  };
+  }, []);
 
   useEffect(() => {
     let filtered = articles;
@@ -41,7 +68,7 @@ const ArticlesPage = () => {
     if (searchTerm) {
       filtered = filtered.filter(article => 
         article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (article.description && article.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        article.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         article.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
@@ -53,46 +80,50 @@ const ArticlesPage = () => {
     setFilteredArticles(filtered);
   }, [articles, searchTerm, selectedCategory]);
 
-  const toggleFavorite = async (id) => {
-    // Note: This would require backend support for favorites
-    // For now, we'll just show a message
-    console.log('Toggle favorite for article:', id);
+  const handleAddArticle = (e) => {
+    e.preventDefault();
+    if (!newArticle.title || !newArticle.url) return;
+    
+    const article = {
+      id: Date.now(),
+      ...newArticle,
+      tags: newArticle.tags.split(",").map(tag => tag.trim()).filter(tag => tag),
+      dateAdded: new Date().toISOString().split("T")[0],
+      isRead: false,
+      isFavorite: false
+    };
+    
+    const updatedArticles = [...articles, article];
+    setArticles(updatedArticles);
+    localStorage.setItem("articles", JSON.stringify(updatedArticles));
+    
+    setNewArticle({
+      title: "",
+      url: "",
+      description: "",
+      category: "technology",
+      tags: "",
+      readTime: "",
+      source: ""
+    });
+    setShowAddForm(false);
   };
 
-  const markAsRead = async (id) => {
-    // Note: This would require backend support for read status
-    // For now, we'll just show a message
-    console.log('Mark as read for article:', id);
+  const toggleFavorite = (id) => {
+    const updatedArticles = articles.map(article => 
+      article.id === id ? { ...article, isFavorite: !article.isFavorite } : article
+    );
+    setArticles(updatedArticles);
+    localStorage.setItem("articles", JSON.stringify(updatedArticles));
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading articles...</p>
-        </div>
-      </div>
+  const markAsRead = (id) => {
+    const updatedArticles = articles.map(article => 
+      article.id === id ? { ...article, isRead: true } : article
     );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-500 text-6xl mb-4"></div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Error Loading Articles</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <button
-            onClick={loadArticles}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition-colors duration-200"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
+    setArticles(updatedArticles);
+    localStorage.setItem("articles", JSON.stringify(updatedArticles));
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -188,8 +219,134 @@ const ArticlesPage = () => {
                 );
               })}
             </div>
+
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition-colors duration-200 flex items-center"
+            >
+              <FiPlus className="h-4 w-4 mr-2" />
+              Add Article
+            </button>
           </div>
         </div>
+
+        {showAddForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Add New Article</h2>
+                  <button
+                    onClick={() => setShowAddForm(false)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <FiX className="h-6 w-6" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleAddArticle} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
+                    <input
+                      type="text"
+                      value={newArticle.title}
+                      onChange={(e) => setNewArticle({...newArticle, title: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">URL *</label>
+                    <input
+                      type="url"
+                      value={newArticle.url}
+                      onChange={(e) => setNewArticle({...newArticle, url: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    <textarea
+                      value={newArticle.description}
+                      onChange={(e) => setNewArticle({...newArticle, description: e.target.value})}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                      <select
+                        value={newArticle.category}
+                        onChange={(e) => setNewArticle({...newArticle, category: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        {categories.slice(1).map(category => (
+                          <option key={category.id} value={category.id}>{category.name}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Read Time</label>
+                      <input
+                        type="text"
+                        value={newArticle.readTime}
+                        onChange={(e) => setNewArticle({...newArticle, readTime: e.target.value})}
+                        placeholder="e.g., 5 min read"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Source</label>
+                      <input
+                        type="text"
+                        value={newArticle.source}
+                        onChange={(e) => setNewArticle({...newArticle, source: e.target.value})}
+                        placeholder="e.g., TechCrunch, Nature"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                      <input
+                        type="text"
+                        value={newArticle.tags}
+                        onChange={(e) => setNewArticle({...newArticle, tags: e.target.value})}
+                        placeholder="e.g., AI, Healthcare, Innovation"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end space-x-4 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddForm(false)}
+                      className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      Add Article
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredArticles.map(article => (
@@ -198,7 +355,7 @@ const ArticlesPage = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-700">
                     <FiBookOpen className="h-4 w-4 mr-1" />
-                    {article.category.charAt(0).toUpperCase() + article.category.slice(1)}
+                    Technology
                   </div>
                   <div className="flex space-x-2">
                     <button
@@ -238,11 +395,11 @@ const ArticlesPage = () => {
                   <div className="flex items-center space-x-4">
                     <span className="flex items-center">
                       <FiClock className="h-4 w-4 mr-1" />
-                      {article.readTime || '5 min read'}
+                      {article.readTime}
                     </span>
                     <span className="flex items-center">
                       <FiCalendar className="h-4 w-4 mr-1" />
-                      {article.dateAdded}
+                      {new Date(article.dateAdded).toLocaleDateString()}
                     </span>
                   </div>
                   {article.source && (
@@ -283,9 +440,16 @@ const ArticlesPage = () => {
             <p className="text-gray-500 mb-6">
               {searchTerm || selectedCategory !== "all" 
                 ? "Try adjusting your search or filter criteria."
-                : "No articles have been added to your collection yet."
+                : "Start building your article collection by adding your first article."
               }
             </p>
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition-colors duration-200 flex items-center mx-auto"
+            >
+              <FiPlus className="h-4 w-4 mr-2" />
+              Add Your First Article
+            </button>
           </div>
         )}
       </div>

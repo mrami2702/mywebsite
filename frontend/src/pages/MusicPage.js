@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiMusic, FiTrendingUp, FiHeart, FiBarChart2, FiZap, FiAward } from 'react-icons/fi';
+import { FiMusic, FiAward, FiZap } from 'react-icons/fi';
 import SpotifyConnect from '../components/SpotifyConnect';
 
 const MusicPage = () => {
@@ -14,52 +14,17 @@ const MusicPage = () => {
           </p>
         </div>
 
-        {/* Quick Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow">
-            <div className="flex items-center">
-              <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-full p-3 mr-4">
-                <FiMusic className="h-6 w-6 text-white" />
+        {/* Centered Spotify Card */}
+        <div className="flex justify-center mb-12">
+          <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100 hover:shadow-lg transition-shadow max-w-md w-full">
+            <div className="flex items-center justify-center">
+              <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-full p-4 mr-6">
+                <FiMusic className="h-8 w-8 text-white" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Music Platform</p>
-                <p className="text-2xl font-bold text-gray-900">Spotify</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow">
-            <div className="flex items-center">
-              <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-full p-3 mr-4">
-                <FiTrendingUp className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Top Tracks</p>
-                <p className="text-2xl font-bold text-gray-900">20+</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow">
-            <div className="flex items-center">
-              <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-full p-3 mr-4">
-                <FiHeart className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Artists</p>
-                <p className="text-2xl font-bold text-gray-900">Diverse</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow">
-            <div className="flex items-center">
-              <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-full p-3 mr-4">
-                <FiBarChart2 className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Analytics</p>
-                <p className="text-2xl font-bold text-gray-900">Live</p>
+              <div className="text-center">
+                <p className="text-sm font-medium text-gray-600 mb-2">Music Platform</p>
+                <p className="text-3xl font-bold text-gray-900">Spotify</p>
+                <p className="text-sm text-green-600 font-medium mt-1">Connected & Live</p>
               </div>
             </div>
           </div>
@@ -96,4 +61,4 @@ const MusicPage = () => {
   );
 };
 
-export default MusicPage; 
+export default MusicPage;

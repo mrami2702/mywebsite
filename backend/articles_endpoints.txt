@@ -1,0 +1,145 @@
+﻿# Articles API Models
+class Article(BaseModel):
+    id: Optional[int] = None
+    title: str
+    url: str
+    description: Optional[str] = ""
+    category: str = "technology"
+    tags: List[str] = []
+    read_time: Optional[str] = ""
+    source: Optional[str] = ""
+    date_added: Optional[str] = None
+    is_read: bool = False
+    is_favorite: bool = False
+
+# Articles API Endpoints
+@app.get("/api/articles", response_model=List[Article])
+async def get_articles():
+    \"\"\"Get all articles\"\"\"
+    conn = None
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute(\"\"\"
+            SELECT * FROM articles 
+            ORDER BY date_added DESC
+        \"\"\")
+        articles = cursor.fetchall()
+        return [dict(article) for article in articles]
+    except Exception as e:
+        print(f" Error getting articles: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if conn:
+            conn.close()
+
+@app.post("/api/articles", response_model=Article)
+async def create_article(article: Article):
+    \"\"\"Create a new article\"\"\"
+    conn = None
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        # Convert tags list to JSON string for storage
+        import json
+        tags_json = json.dumps(article.tags) if article.tags else "[]"
+        
+        cursor.execute(\"\"\"
+            INSERT INTO articles (title, url, description, category, tags, read_time, source, date_added, is_read, is_favorite)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        \"\"\", (
+            article.title,
+            article.url,
+            article.description,
+            article.category,
+            tags_json,
+            article.read_time,
+            article.source,
+            article.date_added or datetime.now().isoformat().split('T')[0],
+            article.is_read,
+            article.is_favorite
+        ))
+        
+        article_id = cursor.lastrowid
+        conn.commit()
+        
+        # Return the created article
+        cursor.execute("SELECT * FROM articles WHERE id = ?", (article_id,))
+        created_article = cursor.fetchone()
+        return dict(created_article)
+    except Exception as e:
+        print(f" Error creating article: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if conn:
+            conn.close()
+
+@app.put("/api/articles/{article_id}", response_model=Article)
+async def update_article(article_id: int, article: Article):
+    \"\"\"Update an article\"\"\"
+    conn = None
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        # Convert tags list to JSON string for storage
+        import json
+        tags_json = json.dumps(article.tags) if article.tags else "[]"
+        
+        cursor.execute(\"\"\"
+            UPDATE articles 
+            SET title = ?, url = ?, description = ?, category = ?, tags = ?, 
+                read_time = ?, source = ?, is_read = ?, is_favorite = ?
+            WHERE id = ?
+        \"\"\", (
+            article.title,
+            article.url,
+            article.description,
+            article.category,
+            tags_json,
+            article.read_time,
+            article.source,
+            article.is_read,
+            article.is_favorite,
+            article_id
+        ))
+        
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Article not found")
+        
+        conn.commit()
+        
+        # Return the updated article
+        cursor.execute("SELECT * FROM articles WHERE id = ?", (article_id,))
+        updated_article = cursor.fetchone()
+        return dict(updated_article)
+    except Exception as e:
+        print(f" Error updating article: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if conn:
+            conn.close()
+
+@app.delete("/api/articles/{article_id}")
+async def delete_article(article_id: int):
+    \"\"\"Delete an article\"\"\"
+    conn = None
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        cursor.execute("DELETE FROM articles WHERE id = ?", (article_id,))
+        
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Article not found")
+        
+        conn.commit()
+        return {"message": "Article deleted successfully"}
+    except Exception as e:
+        print(f" Error deleting article: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if conn:
+            conn.close()
+
