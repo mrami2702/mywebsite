@@ -1,5 +1,4 @@
-// API service for races
-const API_BASE_URL = 'http://localhost:8000/api/races';
+﻿// API service for races\nconst API_BASE_URL = ${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'}/api/races;
 
 export const raceAPI = {
   // Get all races
@@ -86,3 +85,4 @@ export const raceAPI = {
     }
   }
 };
+
