@@ -1,7 +1,7 @@
-import React from 'react';
+﻿import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { FiMail, FiMapPin, FiGithub, FiLinkedin } from 'react-icons/fi';
+import { FiMail, FiMapPin, FiGithub, FiLinkedin, FiCode, FiActivity, FiHeart } from 'react-icons/fi';
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -50,6 +50,34 @@ const ProfileImageImg = styled.img`
   border-radius: 50%;
 `;
 
+const HeroSubtitle = styled(motion.div)`
+  font-size: 1.25rem;
+  color: #8B7B8B;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+`;
+
+const SubtitleItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #9B6B9E;
+  font-weight: 500;
+`;
+
+const SubtitleIcon = styled.div`
+  font-size: 1.1rem;
+  color: #9B6B9E;
+`;
+
 const Bio = styled.p`
   color: #8B7B8B;
   line-height: 1.8;
@@ -57,6 +85,46 @@ const Bio = styled.p`
   text-align: center;
   max-width: 800px;
   margin: 0 auto 2rem;
+`;
+
+const FeaturedGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+`;
+
+const FeaturedCard = styled(motion.div)`
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+  border: 1px solid #f0f0f0;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+`;
+
+const CardIcon = styled.div`
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #9B6B9E;
+`;
+
+const CardTitle = styled.h3`
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+`;
+
+const CardDescription = styled.p`
+  color: #666;
+  line-height: 1.5;
+  font-size: 0.9rem;
 `;
 
 const SkillsGrid = styled.div`
@@ -198,7 +266,26 @@ const AboutPage = () => {
             <ProfileImageImg src="/headshot.jpg" alt="Maya A. Ramirez" />
           </ProfileImage>
           
-          <Bio>
+          <HeroSubtitle
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          <SubtitleItem>
+            <SubtitleIcon><FiCode /></SubtitleIcon>
+            Technology
+          </SubtitleItem>
+          <SubtitleItem>
+            <SubtitleIcon><FiActivity /></SubtitleIcon>
+            Fitness
+          </SubtitleItem>
+          <SubtitleItem>
+            <SubtitleIcon><FiHeart /></SubtitleIcon>
+            Health & Wellness
+          </SubtitleItem>
+        </HeroSubtitle>
+        
+        <Bio>
             I am passionate about health, wellness, and the integration of technology 
             to enhance lives and promote human creativity. Based in Austin, TX, I combine 
             my knowledge in Python development, Generative AI, and AI Agents with my love for fitness 
@@ -233,6 +320,50 @@ const AboutPage = () => {
             </ContactItem>
           </ContactInfo>
         </ContentCard>
+      </Section>
+
+      <Section>
+        <SectionTitle>Quick Overview</SectionTitle>
+        <FeaturedGrid>
+          <FeaturedCard
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            whileHover={{ y: -2 }}
+          >
+            <CardIcon></CardIcon>
+            <CardTitle>Technology</CardTitle>
+            <CardDescription>
+              Python Backend, AI Agents, Generative AI
+            </CardDescription>
+          </FeaturedCard>
+
+          <FeaturedCard
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            whileHover={{ y: -2 }}
+          >
+            <CardIcon></CardIcon>
+            <CardTitle>Fitness</CardTitle>
+            <CardDescription>
+              HYROX Training, Endurance, Strength
+            </CardDescription>
+          </FeaturedCard>
+
+          <FeaturedCard
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            whileHover={{ y: -2 }}
+          >
+            <CardIcon></CardIcon>
+            <CardTitle>Health and Wellness</CardTitle>
+            <CardDescription>
+              Mental health, Healthy food thoughts, Free living
+            </CardDescription>
+          </FeaturedCard>
+        </FeaturedGrid>
       </Section>
 
       <Section>
@@ -304,3 +435,6 @@ const AboutPage = () => {
 };
 
 export default AboutPage; 
+
+
+

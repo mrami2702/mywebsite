@@ -1,5 +1,5 @@
-﻿// API service for articles
-const API_BASE_URL = ${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'}/api/articles/enhanced;
+// API service for articles
+const API_BASE_URL = `${process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000'}/api/articles/enhanced`;
 
 export const articleAPI = {
   // Get all articles
@@ -87,3 +87,4 @@ export const articleAPI = {
   }
 };
 
+export default articleAPI;

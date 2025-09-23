@@ -47,7 +47,11 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # React frontend
+    allow_origins=[
+        "http://localhost:3000",  # React frontend (development)
+        os.getenv("FRONTEND_URL", "http://localhost:3000"),  # Production frontend
+        os.getenv("PRODUCTION_FRONTEND_URL", "")  # Additional production URL
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -222,6 +226,8 @@ def init_db():
             time TEXT,
             placement TEXT,
             notes TEXT,
+            race_type TEXT DEFAULT 'running',
+            distance TEXT DEFAULT '5k',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
@@ -1023,29 +1029,6 @@ async def get_races():
     conn.close()
     return races
 
-@app.post("/api/races", response_model=Race)
-async def create_race(race: RaceBase, current_user: str = Depends(get_current_user)):
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    # Get user ID
-    cursor.execute("SELECT id FROM users WHERE username = ?", (current_user,))
-    user = cursor.fetchone()
-    if not user:
-        conn.close()
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    cursor.execute("""
-        INSERT INTO races (user_id, race_name, date, location, time, placement, notes)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, (user['id'], race.race_name, race.date, race.location, race.time, race.placement, race.notes))
-    
-    race_id = cursor.lastrowid
-    conn.commit()
-    conn.close()
-    
-    return {**race.dict(), "id": race_id, "user_id": user['id'], "created_at": datetime.now()}
-
 # Workouts endpoints
 @app.get("/api/workouts", response_model=List[Workout])
 async def get_workouts():
@@ -1756,8 +1739,8 @@ class RaceResponse(BaseModel):
     location: Optional[str] = None
     time: Optional[str] = None
     placement: Optional[str] = None
-    distance: str
-    raceType: str
+    distance: Optional[str] = '5k'
+    raceType: Optional[str] = 'running'
     notes: Optional[str] = None
     year: int
     
@@ -1780,12 +1763,14 @@ async def get_races():
         race = dict(row)
         # Extract year from date
         race['year'] = datetime.strptime(race['date'], '%Y-%m-%d').year
-        # Add default values for missing fields
-        race['distance'] = '5k'  # Default distance
-        race['raceType'] = 'running'  # Default race type
+        # Use actual values from database
+        race['distance'] = race.get('distance', '5k')  # Use database value or default
+        race['raceType'] = race.get('race_type', 'running')  # Use database value or default
         races.append(RaceResponse(**race))
     conn.close()
     return races
+
+
 
 @app.post("/api/races", response_model=RaceResponse)
 async def create_race(race: RaceCreate):
@@ -1898,8 +1883,8 @@ async def update_race(race_id: int, race: RaceUpdate):
         location=updated_race['location'],
         time=updated_race['time'],
         placement=updated_race['placement'],
-        distance=race.distance or '5k',
-        raceType=race.raceType or 'running',
+        distance='5k',  # Default since column doesn't exist
+        raceType='running',  # Default since column doesn't exist
         notes=updated_race['notes'],
         year=datetime.strptime(updated_race['date'], '%Y-%m-%d').year
     )
@@ -1951,5 +1936,21 @@ async def get_race(race_id: int):
         notes=race['notes'],
         year=datetime.strptime(race['date'], '%Y-%m-%d').year
     )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

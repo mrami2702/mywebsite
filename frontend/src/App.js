@@ -6,7 +6,7 @@ import { Toaster } from 'react-hot-toast';
 
 // Components
 import Navigation from './components/Navigation';
-import HomePage from './pages/HomePage';
+
 import AboutPage from './pages/AboutPage';
 import ArticlesPage from './pages/ArticlesPage';
 import RacesPage from './pages/RacesPage';
@@ -39,7 +39,7 @@ function App() {
           transition={{ duration: 0.5 }}
         >
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<AboutPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/articles" element={<ArticlesPage />} />
             <Route path="/races" element={<RacesPage />} />
@@ -67,3 +67,4 @@ function App() {
 }
 
 export default App;
+

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { FiMenu, FiX, FiHome, FiUser, FiFileText, FiAward, FiActivity, FiMusic, FiBriefcase } from 'react-icons/fi';
+import { FiMenu, FiX, FiUser, FiFileText, FiAward, FiActivity, FiMusic, FiBriefcase } from 'react-icons/fi';
 
 const NavContainer = styled(motion.nav)`
   position: fixed;
@@ -129,7 +129,7 @@ const Navigation = () => {
   const location = useLocation();
   
   const navItems = [
-    { path: '/', label: 'Home', icon: <FiHome /> },
+    
     { path: '/about', label: 'About', icon: <FiUser /> },
     { path: '/articles', label: 'Articles', icon: <FiFileText /> },
     { path: '/races', label: 'Races', icon: <FiAward /> },
